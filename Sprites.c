@@ -19,7 +19,7 @@ unsigned char y_position=0x40; // all share same Y, which increases every frame
 unsigned char x_position=0x88;
 unsigned char x_position2=0xa0;
 unsigned char x_position3=0xc0;
-unsigned char sprid; // remember the index into the sprite buffer
+
 
 
 
@@ -78,20 +78,17 @@ void main (void) {
 		// clear all sprites from sprite buffer
 		oam_clear();
 		
-		// reset index into the sprite buffer
-		sprid = 0;
-		
 		// push a single sprite
-		// oam_spr(unsigned char x,unsigned char y,unsigned char chrnum,unsigned char attr,unsigned char sprid);
+		// oam_spr(unsigned char x,unsigned char y,unsigned char chrnum,unsigned char attr);
 		// use tile #0, palette #0
-		sprid = oam_spr(x_position, y_position, 0, 0, sprid);
+		oam_spr(x_position, y_position, 0, 0);
 		
 		// push a metasprite
-		// oam_meta_spr(unsigned char x,unsigned char y,unsigned char sprid,const unsigned char *data);
-		sprid = oam_meta_spr(x_position2, y_position, sprid, metasprite);
+		// oam_meta_spr(unsigned char x,unsigned char y,const unsigned char *data);
+		oam_meta_spr(x_position2, y_position, metasprite);
 		
 		// and another
-		sprid = oam_meta_spr(x_position3, y_position, sprid, metasprite2);
+		oam_meta_spr(x_position3, y_position, metasprite2);
 		
 		++y_position; // every frame, shift them down 1 pixel
 		// note, y positions 0xef-0xff will not appear on the screen

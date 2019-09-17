@@ -28,7 +28,6 @@
 	.export		_x_position
 	.export		_x_position2
 	.export		_x_position3
-	.export		_sprid
 	.export		_text
 	.export		_palette_bg
 	.export		_palette_sp
@@ -135,8 +134,6 @@ _palette_sp:
 .segment	"BSS"
 
 .segment	"ZEROPAGE"
-_sprid:
-	.res	1,$00
 
 ; ---------------------------------------------------------------
 ; void __near__ main (void)
@@ -197,62 +194,45 @@ L0069:	jsr     _ppu_wait_nmi
 ;
 	jsr     _oam_clear
 ;
-; sprid = 0;
-;
-	lda     #$00
-	sta     _sprid
-;
-; sprid = oam_spr(x_position, y_position, 0, 0, sprid);
-;
-	jsr     decsp4
-	lda     _x_position
-	ldy     #$03
-	sta     (sp),y
-	lda     _y_position
-	dey
-	sta     (sp),y
-	lda     #$00
-	dey
-	sta     (sp),y
-	dey
-	sta     (sp),y
-	lda     _sprid
-	jsr     _oam_spr
-	sta     _sprid
-;
-; sprid = oam_meta_spr(x_position2, y_position, sprid, metasprite);
+; oam_spr(x_position, y_position, 0, 0);
 ;
 	jsr     decsp3
-	lda     _x_position2
+	lda     _x_position
 	ldy     #$02
 	sta     (sp),y
 	lda     _y_position
 	dey
 	sta     (sp),y
-	lda     _sprid
+	lda     #$00
+	dey
+	sta     (sp),y
+	jsr     _oam_spr
+;
+; oam_meta_spr(x_position2, y_position, metasprite);
+;
+	jsr     decsp2
+	lda     _x_position2
+	ldy     #$01
+	sta     (sp),y
+	lda     _y_position
 	dey
 	sta     (sp),y
 	lda     #<(_metasprite)
 	ldx     #>(_metasprite)
 	jsr     _oam_meta_spr
-	sta     _sprid
 ;
-; sprid = oam_meta_spr(x_position3, y_position, sprid, metasprite2);
+; oam_meta_spr(x_position3, y_position, metasprite2);
 ;
-	jsr     decsp3
+	jsr     decsp2
 	lda     _x_position3
-	ldy     #$02
+	ldy     #$01
 	sta     (sp),y
 	lda     _y_position
-	dey
-	sta     (sp),y
-	lda     _sprid
 	dey
 	sta     (sp),y
 	lda     #<(_metasprite2)
 	ldx     #>(_metasprite2)
 	jsr     _oam_meta_spr
-	sta     _sprid
 ;
 ; ++y_position; // every frame, shift them down 1 pixel
 ;
